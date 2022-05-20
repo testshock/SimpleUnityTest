@@ -68,13 +68,13 @@ def createVersionFile(properties){
     HASH = "HASH='${GIT_COMMIT_SHORT}'"
     BUILDDATE = "BUILDDATE='${BUILD_DATE}'"
     BUILDTIME = "BUILDTIME='${BUILD_TIME}'"
-    TAG_NAME = "TAG='${TAG_NAME}'"
+    //TAG_NAME = "TAG='${TAG_NAME}'"
     VTAG = "VTAG='${env.BRANCH_NAME}'"
     VERSION_NAME = "VERSIONNAME=${properties.versionname}"
     VERSION = "VERSION=${properties.version}"
     COMMENTS = "COMMENTS=${properties.comments}"
 
-    STR = VERSION+"\n"+VERSION_NAME+"\n"+VTAG+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME+"\n"+TAG_NAME+"\n"+COMMENTS
+    STR = VERSION+"\n"+VERSION_NAME+"\n"+VTAG+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME+"\n"+COMMENTS
 
     writeFile file: 'version.properties', text: STR
 
