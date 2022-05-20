@@ -43,7 +43,7 @@ node('NativeMacOSJenkins') {
             //echo "${env.GITHUB_TOKEN}"
 
             stageName='Delete release'
-            sh "use $GITHUB_TOKEN | github-release delete --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}"
+            sh "github-release delete --security-token $GITHUB_TOKEN --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}"
         
             stageName='Create release'
             sh "GITHUB_TOKEN=${GITHUB_TOKEN} | github-release release --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name ${properties.VERSION_NAME}"
