@@ -18,7 +18,7 @@ node('NativeMacOSJenkins') {
         if (properties.iOS == 'TRUE') {
             stageName='Build Unity iOS'
             stage(stageName){
-                sh "/Applications/Unity/Hub/Editor/${properties.UNITY_VERSION}/Unity.app/Contents/MacOS/Unity -quit -buildTarget iOS -batchmode -projectPath . -executeMethod BuildScript.PerformiOSBuild"
+//                sh "/Applications/Unity/Hub/Editor/${properties.UNITY_VERSION}/Unity.app/Contents/MacOS/Unity -quit -buildTarget iOS -batchmode -projectPath . -executeMethod BuildScript.PerformiOSBuild"
             }
     
             stageName='Build XCode project'
@@ -33,12 +33,12 @@ node('NativeMacOSJenkins') {
         // i just zip and upload the build dir. I know that this is wrong, it's just a placeholder
         stageName='Archive artifacts'
         stage(stageName){
-            sh "zip -r artifacts.zip builds"
+//            sh "zip -r artifacts.zip builds"
         }
 
 
         // export needed tokens for github-release tool
-        withCredentials([usernameColonPassword(credentialsId: 'cmd', variable: 'GITHUB_TOKEN')]) {
+        withCredentials([string(credentialsId: 'testshock', variable: 'GITHUB_TOKEN')]) {
             echo GITHUB_TOKEN
 
             stageName='Delete release'
