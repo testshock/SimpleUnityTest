@@ -1,5 +1,6 @@
 //@Library('jenkins-shared-library') _
 node('NativeMacOSJenkins') {
+    checkout scm
     createVersionFile()
 
     //if (params.build){
