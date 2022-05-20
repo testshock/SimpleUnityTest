@@ -33,7 +33,7 @@ node('NativeMacOSJenkins') {
         // i just zip and upload the build dir. I know that this is wrong, it's just a placeholder
         stageName='Archive artifacts'
         stage(stageName){
-            sh "zip -r ${properties.VERSION}-${VTAG}.zip builds"
+            sh "zip -r ${properties.VERSION}.zip builds"
         }
 
 
@@ -56,7 +56,9 @@ node('NativeMacOSJenkins') {
             sh '/usr/local/bin/github-release upload --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name "${properties.PROJECT_NAME}-${properties.VERSION_NAME}.zip" --file artifacts.zip'
         }
         */
-        echo "SLACK"
+
+        notifyFinished()
+
     } catch (e){
         currentBuild.result='FAILURE'
         errorMessage="Failed on stage "+stageName
@@ -91,8 +93,13 @@ def createVersionFile(properties){
 
 }
 
+def notifyFinished(){
+    slackSend botUser: true, channel: 'test-notification', color: '#00ff00', message: '${properties.PROJECT_NAME} Version:${properties.VERSION} Branch:${env.BRANCH_NAME} Success', tokenCredentialId: 'slack-jenkins-id'
+}
+
 def notifyFailed(stageName,e) {
     echo "Failed while in Stage ${stageName}"
+    slackSend botUser: true, channel: 'test-notification', color: '#FF0000', message: '${properties.PROJECT_NAME} Version:${properties.VERSION} Branch:${env.BRANCH_NAME} Failed in Stage:${stageName}', tokenCredentialId: 'slack-jenkins-id'
     echo e
 }
 
