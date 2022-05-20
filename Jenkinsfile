@@ -39,7 +39,7 @@ node('NativeMacOSJenkins') {
 
         stageName='Upload to Artifactory'
         stage(stageName){
-            upload2Artifactory()
+            upload2Artifactory(properties.PROJECT_NAME)
         }
 
         /* Upload release to Github
@@ -57,12 +57,12 @@ node('NativeMacOSJenkins') {
         }
         */
 
-        notifyFinished()
+        notifyFinished(properties.PROJECT_NAME,properties.VERSION,env.BRANCH_NAME,$GIT_COMMIT_SHORT)
 
     } catch (e){
         currentBuild.result='FAILURE'
         errorMessage="Failed on stage "+stageName
-        notifyFailed(stageName,e)
+        notifyFailed(stageName,e,properties.PROJECT_NAME,properties.VERSION,env.BRANCH_NAME,$GIT_COMMIT_SHORT)
     }
 }
 
@@ -93,18 +93,18 @@ def createVersionFile(properties){
 
 }
 
-def notifyFinished(){
-    slackSend botUser: true, channel: 'test-notification', color: '#00ff00', message: '${properties.PROJECT_NAME} Version:${properties.VERSION} Branch:${env.BRANCH_NAME} Success', tokenCredentialId: 'slack-jenkins-id'
+def notifyFinished(projectName,version,branchName,hash){
+    slackSend botUser: true, channel: 'test-notification', color: '#00ff00', message: '${projectName} Version:${version} Branch:${branchName} Success', tokenCredentialId: 'slack-jenkins-id'
 }
 
-def notifyFailed(stageName,e) {
+def notifyFailed(stageName,e,projectName,version,branchName,hash) {
     echo "Failed while in Stage ${stageName}"
-    slackSend botUser: true, channel: 'test-notification', color: '#FF0000', message: '${properties.PROJECT_NAME} Version:${properties.VERSION} Branch:${env.BRANCH_NAME} Failed in Stage:${stageName}', tokenCredentialId: 'slack-jenkins-id'
+    slackSend botUser: true, channel: 'test-notification', color: '#FF0000', message: '${projectName} Version:${version} Branch:${branchName} Failed in Stage:${stageName}', tokenCredentialId: 'slack-jenkins-id'
     echo e
 }
 
-def upload2Artifactory(){
-  url = "${properties.PROJECT_NAME}/"
+def upload2Artifactory(projectName){
+  url = "${projectName}/"
   stage("Upload REST APIs to Artifactory "+url) {
     proben: {
           def server = Artifactory.server 'testshock-af'
