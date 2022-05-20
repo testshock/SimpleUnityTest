@@ -38,7 +38,7 @@ node('NativeMacOSJenkins') {
 
 
         // export needed tokens for github-release tool
-        withCredentials([usernamePassword(credentialsId: 'testshock', passwordVariable: 'GITHUB_TOKEN')]) {
+//        withCredentials([usernamePassword(credentialsId: 'testshock', passwordVariable: 'GITHUB_TOKEN')]) {
           
             echo "${properties.GITHUB_ORGANIZATION}"
             echo "${properties.GITHUB_REPO}"
@@ -52,7 +52,7 @@ node('NativeMacOSJenkins') {
 
             stageName='Upload release'
             sh 'github-release upload --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name "${properties.PROJECT_NAME}-${properties.VERSION_NAME}.zip" --file artifacts.zip'
-        }
+  //      }
         echo "SLACK"
     } catch (e){
         currentBuild.result='FAILURE'
