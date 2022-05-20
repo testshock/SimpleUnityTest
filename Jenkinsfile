@@ -7,7 +7,13 @@ node('NativeMacOSJenkins') {
     properties = readProperties file: 'config.properties'
 
     // Generate version file with static and dynamic info
-    createVersionFile(properties)
+    GIT_COMMIT_SHORT = sh(
+       script: "git rev-parse --short=6 HEAD",
+       returnStdout: true
+    )
+    GIT_COMMIT_SHORT = GIT_COMMIT_SHORT.replaceAll("\n","")
+
+    createVersionFile(properties,GIT_COMMIT_SHORT)
 
     // Global Exception handling.
     try {
@@ -66,16 +72,10 @@ node('NativeMacOSJenkins') {
     }
 }
 
-def createVersionFile(properties){
-        GIT_COMMIT_SHORT = sh(
-        script: "git rev-parse --short=6 HEAD",
-        returnStdout: true
-    )
-
-    GIT_COMMIT_SHORT = GIT_COMMIT_SHORT.replaceAll("\n","")
+def createVersionFile(properties,gitCommitShort){
 
     STR = ""
-    HASH = "HASH='${GIT_COMMIT_SHORT}'"
+    HASH = "HASH='${gitCommitShort}'"
     BUILDDATE = "BUILDDATE='${BUILD_DATE}'"
     BUILDTIME = "BUILDTIME='${BUILD_TIME}'"
     //TAG_NAME = "TAG='${TAG_NAME}'"
