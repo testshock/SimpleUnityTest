@@ -23,46 +23,9 @@ def createVersionFile(){
     HASH = "export const HASH = '${GIT_COMMIT_SHORT}';"
     BUILDDATE = "export const BUILDDATE = '${BUILD_DATE}';"
     BUILDTIME = "export const BUILDTIME = '${BUILD_TIME}';"
-    VTAG = "export const VTAG = '${BRANCH}';"
+    VTAG = "export const VTAG = '${env.BRANCH_NAME}';"
 
     STR = VTAG+'\n'+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME
-
-    writeFile file: 'version.ts', text: STR
-}
-
-def createDevVersionFile(){
-    GIT_COMMIT_SHORT = sh(
-        script: "git rev-parse --short=6 HEAD",
-        returnStdout: true
-    )
-    GIT_COMMIT_SHORT = GIT_COMMIT_SHORT.replaceAll("\n","")
-
-    // crreate version.ts file
-    STR = ""
-    HASH = "export const HASH = '${GIT_COMMIT_SHORT}';"
-    BUILDDATE = "export const BUILDDATE = '${BUILD_DATE}';"
-    BUILDTIME = "export const BUILDTIME = '${BUILD_TIME}';"
-    VTAG = "export const VTAG = '0';"
-    DISTANCE = "export const DISTANCE = 'not implemented';"
-    STR = VTAG+'\n'+DISTANCE+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME
-
-    writeFile file: 'version.ts', text: STR
-}
-def createTagedVersionFile(){
-    GIT_COMMIT_SHORT = sh(
-        script: "git rev-parse --short=6 HEAD",
-        returnStdout: true
-    )
-
-    GIT_COMMIT_SHORT = GIT_COMMIT_SHORT.replaceAll("\n","")
-
-    STR = ""
-    HASH = "export const HASH = '${GIT_COMMIT_SHORT}';"
-    BUILDDATE = "export const BUILDDATE = '${BUILD_DATE}';"
-    BUILDTIME = "export const BUILDTIME = '${BUILD_TIME}';"
-    VTAG = "export const VTAG = '${GITTAG}';"
-    DISTANCE = "export const DISTANCE = 'not implemented';"
-    STR = VTAG+'\n'+DISTANCE+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME
 
     writeFile file: 'version.ts', text: STR
 }
