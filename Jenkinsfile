@@ -43,13 +43,13 @@ node('NativeMacOSJenkins') {
             //echo "${env.GITHUB_TOKEN}"
 
             stageName='Delete release'
-            sh "github-release delete --security-token $GITHUB_TOKEN --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}"
+            sh "github-release delete --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}"
         
             stageName='Create release'
-            sh "GITHUB_TOKEN=${GITHUB_TOKEN} | github-release release --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name ${properties.VERSION_NAME}"
+            sh "github-release release --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name ${properties.VERSION_NAME}"
 
             stageName='Upload release'
-            sh 'GITHUB_TOKEN=${GITHUB_TOKEN} | github-release upload --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name "${properties.PROJECT_NAME}-${properties.VERSION_NAME}.zip" --file artifacts.zip'
+            sh 'github-release upload --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name "${properties.PROJECT_NAME}-${properties.VERSION_NAME}.zip" --file artifacts.zip'
         }
         echo "SLACK"
     } catch (e){
