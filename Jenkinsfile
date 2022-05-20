@@ -18,7 +18,7 @@ node('NativeMacOSJenkins') {
         if (properties.iOS == 'TRUE') {
             stageName='Build Unity iOS'
             stage(stageName){
-                sh "/Applications/Unity/Hub/Editor/${properties.unityversion}/Unity.app/Contents/MacOS/Unity -quit -buildTarget iOS -batchmode -projectPath . -executeMethod BuildScript.PerformiOSBuild"
+                sh "/Applications/Unity/Hub/Editor/${properties.UNITY_VERSION}/Unity.app/Contents/MacOS/Unity -quit -buildTarget iOS -batchmode -projectPath . -executeMethod BuildScript.PerformiOSBuild"
             }
     
             stageName='Build XCode project'
@@ -33,7 +33,7 @@ node('NativeMacOSJenkins') {
         // i just zip and upload the build dir. I know that this is wrong, it's just a placeholder
         stageName='Archive artifacts'
         stage(stageName){
-            sh "zip -r artifacts.zip bulds"
+            sh "zip -r artifacts.zip builds"
         }
 
 
@@ -41,7 +41,10 @@ node('NativeMacOSJenkins') {
         environment {
                 GITHUB_TOKEN = credentials('cmd')
         }
+        echo GITHUB_TOKEN
+
         stageName='Delete release'
+        github-release delete --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}
         
         stageName='Create release'
 
@@ -70,9 +73,9 @@ def createVersionFile(properties){
     BUILDTIME = "BUILDTIME='${BUILD_TIME}'"
     //TAG_NAME = "TAG='${TAG_NAME}'"
     VTAG = "VTAG='${env.BRANCH_NAME}'"
-    VERSION_NAME = "VERSIONNAME=${properties.versionname}"
-    VERSION = "VERSION=${properties.version}"
-    COMMENTS = "COMMENTS=${properties.comments}"
+    VERSION_NAME = "VERSIONNAME=${properties.VERSION_NAME}"
+    VERSION = "VERSION=${properties.VERSION}"
+    COMMENTS = "COMMENTS=${properties.COMMENT}"
 
     STR = VERSION+"\n"+VERSION_NAME+"\n"+VTAG+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME+"\n"+COMMENTS
 
