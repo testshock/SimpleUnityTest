@@ -40,7 +40,9 @@ node('NativeMacOSJenkins') {
         // export needed tokens for github-release tool
         withCredentials([usernamePassword(credentialsId: 'testshock', passwordVariable: 'GITHUB_TOKEN')]) {
           
-            //echo "${env.GITHUB_TOKEN}"
+            echo "${properties.GITHUB_ORGANIZATION}"
+            echo "${properties.GITHUB_REPO}"
+            echo "${properties.VERSION_NAME}"
 
             stageName='Delete release'
             sh "github-release delete --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}"
