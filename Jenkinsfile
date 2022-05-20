@@ -50,8 +50,8 @@ node('NativeMacOSJenkins') {
 
         echo "SLACK"
     } catch (e){
-        currentBuild.result='FAILURE';
-        errorMessage("Failed on stage "+stageName)
+        currentBuild.result='FAILURE'
+        errorMessage="Failed on stage "+stageName
         notifyFailed(stageName,e)
     }
 }
