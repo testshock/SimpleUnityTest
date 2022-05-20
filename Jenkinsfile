@@ -3,7 +3,7 @@ node('NativeMacOSJenkins') {
     if (params.checkout){
         stage('Checkout and Build') {
             echo "Going for "+BRANCH
-            git branch: BRANCH, credentialsId:'github-user', url: 'https://github.com/testshock/Test2D.git'
+            git branch: BRANCH, url: 'https://github.com/testshock/SimpleUnityTest.git'
             echo "Finished"
             createVersionFile()
         }
