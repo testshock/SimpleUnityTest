@@ -63,7 +63,7 @@ node('NativeMacOSJenkins') {
         }
         */
 
-        notifyFinished(properties.PROJECT_NAME,properties.VERSION,env.BRANCH_NAME,$GIT_COMMIT_SHORT)
+        notifyFinished(properties.PROJECT_NAME,properties.VERSION,env.BRANCH_NAME,GIT_COMMIT_SHORT)
 
     } catch (e){
         currentBuild.result='FAILURE'
