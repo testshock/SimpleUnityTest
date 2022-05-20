@@ -33,12 +33,18 @@ node('NativeMacOSJenkins') {
         // i just zip and upload the build dir. I know that this is wrong, it's just a placeholder
         stageName='Archive artifacts'
         stage(stageName){
-//            sh "zip -r artifacts.zip builds"
+            sh "zip -r ${properties.VERSION}-${VTAG}.zip builds"
         }
 
 
+        stageName='Upload to Artifactory'
+        stage(stageName){
+            upload2Artifactory()
+        }
+
+        /* Upload release to Github
         // export needed tokens for github-release tool
-//        withCredentials([usernamePassword(credentialsId: 'testshock', passwordVariable: 'GITHUB_TOKEN')]) {
+        withCredentials([usernamePassword(credentialsId: 'testshock', passwordVariable: 'GITHUB_TOKEN')]) {
           
             stageName='Delete release'
             sh "/usr/local/bin/github-release delete --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}"
@@ -48,7 +54,8 @@ node('NativeMacOSJenkins') {
 
             stageName='Upload release'
             sh '/usr/local/bin/github-release upload --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name "${properties.PROJECT_NAME}-${properties.VERSION_NAME}.zip" --file artifacts.zip'
-  //      }
+        }
+        */
         echo "SLACK"
     } catch (e){
         currentBuild.result='FAILURE'
@@ -87,4 +94,32 @@ def createVersionFile(properties){
 def notifyFailed(stageName,e) {
     echo "Failed while in Stage ${stageName}"
     echo e
+}
+
+def upload2Artifactory(){
+  url = "${properties.PROJECT_NAME}/"
+  stage("Upload REST APIs to Artifactory "+url) {
+    proben: {
+          def server = Artifactory.server 'testshock-af'
+          def uploadSpec = """{
+               "files": [
+                {
+                    "pattern": "*.zip",
+                    "target": "${url}"
+                  }
+               ]
+              }"""
+
+          try {
+              def buildInfo = Artifactory.newBuildInfo()
+              server.upload spec: uploadSpec, buildInfo: buildInfo
+              server.publishBuildInfo buildInfo
+          }catch (e){
+              errorMessage='Upload to Artifactory failed';
+              notifyFailed(errorMessage,e);
+              return;                    
+          }
+//        notifyEmail("Uploaded on Artifactory","Good Job!")
+    }
+  }
 }
