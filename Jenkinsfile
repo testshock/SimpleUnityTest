@@ -94,12 +94,12 @@ def createVersionFile(properties,gitCommitShort){
 }
 
 def notifyFinished(projectName,version,branchName,hash){
-    slackSend botUser: true, channel: 'test-notification', color: '#00ff00', message: '${projectName} Version:${version} Branch:${branchName} Success', tokenCredentialId: 'slack-jenkins-id'
+    slackSend botUser: true, channel: 'test-notification', color: '#00ff00', message: projectName+" Version:"+version+" Branch:"+branchName+" Success", tokenCredentialId: 'slack-jenkins-id'
 }
 
 def notifyFailed(stageName,e,projectName,version,branchName,hash) {
     echo "Failed while in Stage ${stageName}"
-    slackSend botUser: true, channel: 'test-notification', color: '#FF0000', message: '${projectName} Version:${version} Branch:${branchName} Failed in Stage:${stageName}', tokenCredentialId: 'slack-jenkins-id'
+    slackSend botUser: true, channel: 'test-notification', color: '#FF0000', message: projectName+" Version:"version+" Branch:"+branchName+" Failed in Stage:"+stageName, tokenCredentialId: 'slack-jenkins-id'
     echo e
 }
 
