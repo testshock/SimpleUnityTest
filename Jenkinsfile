@@ -1,20 +1,13 @@
 //@Library('jenkins-shared-library') _
 node('NativeMacOSJenkins') {
-    if (params.checkout){
-        stage('Checkout and Build') {
-            echo "Going for "+BRANCH
-            git branch: BRANCH, url: 'https://github.com/testshock/SimpleUnityTest.git'
-            echo "Finished"
-            createVersionFile()
-        }
-    }
+    createVersionFile()
 
-    if (params.build){
+    //if (params.build){
         stage('Build'){
             //build-unity(UNITYVERSION, TARGET,'Test2D')
-            sh "/Applications/Unity/Hub/Editor/${UNITYVERSION}/Unity.app/Contents/MacOS/Unity -quit -buildTarget ${BUILDTARGET} -batchmode -projectPath . -executeMethod BuildScript.Perform${BUILDTARGET}Build"
+            sh "/Applications/Unity/Hub/Editor/2020.3.30f1/Unity.app/Contents/MacOS/Unity -quit -buildTarget iOS -batchmode -projectPath . -executeMethod BuildScript.PerformiOSBuild"
         }
-    }
+    //}
 }
 
 def createVersionFile(){
