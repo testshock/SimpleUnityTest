@@ -1,23 +1,62 @@
 //@Library('jenkins-shared-library') _
 node('NativeMacOSJenkins') {
-    if (params.checkout){
-        stage('Checkout and Build') {
-            echo "Going for "+BRANCH
-            git branch: BRANCH, credentialsId:'github-user', url: 'https://github.com/testshock/Test2D.git'
-            echo "Finished"
-            createVersionFile()
-        }
-    }
+    // Checkout code
+    checkout scm
 
-    if (params.build){
-        stage('Build'){
-            //build-unity(UNITYVERSION, TARGET,'Test2D')
-            sh "/Applications/Unity/Hub/Editor/${UNITYVERSION}/Unity.app/Contents/MacOS/Unity -quit -buildTarget ${BUILDTARGET} -batchmode -projectPath . -executeMethod BuildScript.Perform${BUILDTARGET}Build"
+    // Load static properties from config.properties
+    properties = readProperties file: 'config.properties'
+
+    // Generate version file with static and dynamic info
+    createVersionFile(properties)
+
+    // Global Exception handling.
+    try {
+        echo "BUILD"
+
+        // Build iOS Unity project IF key iOS='TRUE' (in config.properties file)
+
+        if (properties.iOS == 'TRUE') {
+            stageName='Build Unity iOS'
+            stage(stageName){
+                sh "/Applications/Unity/Hub/Editor/${properties.unity}/Unity.app/Contents/MacOS/Unity -quit -buildTarget iOS -batchmode -projectPath . -executeMethod BuildScript.PerformiOSBuild"
+            }
+    
+            stageName='Build XCode project'
+            stage(stageName){
+                echo "Ioannis insert your build code here"
+            }
         }
+        
+        echo "ARCHIVE"
+        // Upload the final artifact (Binaries) to GitHub
+        // Ioannis since i haven't build the final XCode project (you must insert your build script above)
+        // i just zip and upload the build dir. I know that this is wrong, it's just a placeholder
+        stageName='Archive artifacts'
+        stage(stageName){
+            sh "zip -r artifacts.zip bulds"
+        }
+
+
+        // export needed tokens for github-release tool
+        environment {
+                GITHUB_TOKEN = credentials('cmd')
+        }
+        stageName='Delete release'
+        
+        stageName='Create release'
+
+        stageName='Upload release'
+
+
+        echo "SLACK"
+    } catch (e){
+        currentBuild.result='FAILURE'
+        errorMessage="Failed on stage "+stageName
+        notifyFailed(stageName,e)
     }
 }
 
-def createVersionFile(){
+def createVersionFile(properties){
         GIT_COMMIT_SHORT = sh(
         script: "git rev-parse --short=6 HEAD",
         returnStdout: true
@@ -26,49 +65,25 @@ def createVersionFile(){
     GIT_COMMIT_SHORT = GIT_COMMIT_SHORT.replaceAll("\n","")
 
     STR = ""
-    HASH = "export const HASH = '${GIT_COMMIT_SHORT}';"
-    BUILDDATE = "export const BUILDDATE = '${BUILD_DATE}';"
-    BUILDTIME = "export const BUILDTIME = '${BUILD_TIME}';"
-    VTAG = "export const VTAG = '${BRANCH}';"
+    HASH = "HASH='${GIT_COMMIT_SHORT}'"
+    BUILDDATE = "BUILDDATE='${BUILD_DATE}'"
+    BUILDTIME = "BUILDTIME='${BUILD_TIME}'"
+    //TAG_NAME = "TAG='${TAG_NAME}'"
+    VTAG = "VTAG='${env.BRANCH_NAME}'"
+    VERSION_NAME = "VERSIONNAME=${properties.versionname}"
+    VERSION = "VERSION=${properties.version}"
+    COMMENTS = "COMMENTS=${properties.comments}"
 
-    STR = VTAG+'\n'+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME
+    STR = VERSION+"\n"+VERSION_NAME+"\n"+VTAG+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME+"\n"+COMMENTS
 
-    writeFile file: 'version.ts', text: STR
+    writeFile file: 'version.properties', text: STR
+
+    // Generate Jenkins description info
+    currentBuild.description = VTAG+" H:"+HASH+" V:"+VERSION
+
 }
 
-def createDevVersionFile(){
-    GIT_COMMIT_SHORT = sh(
-        script: "git rev-parse --short=6 HEAD",
-        returnStdout: true
-    )
-    GIT_COMMIT_SHORT = GIT_COMMIT_SHORT.replaceAll("\n","")
-
-    // crreate version.ts file
-    STR = ""
-    HASH = "export const HASH = '${GIT_COMMIT_SHORT}';"
-    BUILDDATE = "export const BUILDDATE = '${BUILD_DATE}';"
-    BUILDTIME = "export const BUILDTIME = '${BUILD_TIME}';"
-    VTAG = "export const VTAG = '0';"
-    DISTANCE = "export const DISTANCE = 'not implemented';"
-    STR = VTAG+'\n'+DISTANCE+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME
-
-    writeFile file: 'version.ts', text: STR
-}
-def createTagedVersionFile(){
-    GIT_COMMIT_SHORT = sh(
-        script: "git rev-parse --short=6 HEAD",
-        returnStdout: true
-    )
-
-    GIT_COMMIT_SHORT = GIT_COMMIT_SHORT.replaceAll("\n","")
-
-    STR = ""
-    HASH = "export const HASH = '${GIT_COMMIT_SHORT}';"
-    BUILDDATE = "export const BUILDDATE = '${BUILD_DATE}';"
-    BUILDTIME = "export const BUILDTIME = '${BUILD_TIME}';"
-    VTAG = "export const VTAG = '${GITTAG}';"
-    DISTANCE = "export const DISTANCE = 'not implemented';"
-    STR = VTAG+'\n'+DISTANCE+"\n"+HASH+"\n"+BUILDDATE+"\n"+BUILDTIME
-
-    writeFile file: 'version.ts', text: STR
+def notifyFailed(stageName,e) {
+    echo "Failed while in Stage ${stageName}"
+    echo e
 }
