@@ -40,18 +40,14 @@ node('NativeMacOSJenkins') {
         // export needed tokens for github-release tool
 //        withCredentials([usernamePassword(credentialsId: 'testshock', passwordVariable: 'GITHUB_TOKEN')]) {
           
-            echo "${properties.GITHUB_ORGANIZATION}"
-            echo "${properties.GITHUB_REPO}"
-            echo "${properties.VERSION_NAME}"
-
             stageName='Delete release'
-            sh "github-release delete --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}"
+            sh "/usr/local/bin/github-release delete --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}"
         
             stageName='Create release'
-            sh "github-release release --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name ${properties.VERSION_NAME}"
+            sh "/usr/local/bin/github-release release --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name ${properties.VERSION_NAME}"
 
             stageName='Upload release'
-            sh 'github-release upload --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name "${properties.PROJECT_NAME}-${properties.VERSION_NAME}.zip" --file artifacts.zip'
+            sh '/usr/local/bin/github-release upload --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name "${properties.PROJECT_NAME}-${properties.VERSION_NAME}.zip" --file artifacts.zip'
   //      }
         echo "SLACK"
     } catch (e){
