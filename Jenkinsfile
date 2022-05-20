@@ -44,12 +44,13 @@ node('NativeMacOSJenkins') {
         echo GITHUB_TOKEN
 
         stageName='Delete release'
-        github-release delete --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}
+        sh "github-release delete --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME}"
         
         stageName='Create release'
+        sh "github-release release --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name "${properties.VERSION_NAME}""
 
         stageName='Upload release'
-
+        sh "github-release upload --user ${properties.GITHUB_ORGANIZATION} --repo ${properties.GITHUB_REPO} --tag ${properties.VERSION_NAME} --name "${properties.PROJECT_NAME}-${properties.VERSION_NAME}.zip" --file artifacts.zip"
 
         echo "SLACK"
     } catch (e){
