@@ -29,7 +29,7 @@ node('NativeMacOSJenkins') {
     
             stageName='Build XCode project'
             stage(stageName){
-                sh 'xcodebuild -project build/iOS/Unity-iPhone.xcodeproj -scheme "Unity-iPhone" -configuration Release CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=5CS6V7W342 -archivePath ${properties.VERSION}.xcarchive archive'
+                sh "xcodebuild -project build/iOS/Unity-iPhone.xcodeproj -scheme Unity-iPhone -configuration Release CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=5CS6V7W342 -archivePath ${properties.PROJECT_NAME}.xcarchive archive"
             }
         }
         
