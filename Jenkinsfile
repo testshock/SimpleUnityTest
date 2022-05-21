@@ -29,7 +29,9 @@ node('NativeMacOSJenkins') {
     
             stageName='Build XCode project'
             stage(stageName){
-                sh "xcodebuild -project builds/iOS/Unity-iPhone.xcodeproj -scheme Unity-iPhone -configuration Release CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=5CS6V7W342 -archivePath ${properties.PROJECT_NAME}.xcarchive archive"
+                dir('builds/iOS') {
+                    sh "xcodebuild -project Unity-iPhone.xcodeproj -scheme Unity-iPhone -configuration Release CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=5CS6V7W342 -archivePath ../../${properties.PROJECT_NAME}-${properties.VERSION}.xcarchive archive"
+                }
             }
         }
         
@@ -39,7 +41,7 @@ node('NativeMacOSJenkins') {
         // i just zip and upload the build dir. I know that this is wrong, it's just a placeholder
         stageName='Archive artifacts'
         stage(stageName){
-            sh "zip -r ${properties.VERSION}.zip ${properties.VERSION}.xcarchive"
+            sh "zip -r ${properties.VERSION}.zip ${properties.PROJECT_NAME}-${properties.VERSION}.xcarchive"
         }
 
 
