@@ -24,7 +24,7 @@ node('NativeMacOSJenkins') {
         if (properties.iOS == 'TRUE') {
             stageName='Build Unity iOS'
             stage(stageName){
-//                sh "/Applications/Unity/Hub/Editor/${properties.UNITY_VERSION}/Unity.app/Contents/MacOS/Unity -quit -buildTarget iOS -batchmode -projectPath . -executeMethod BuildScript.PerformiOSBuild"
+                sh "/Applications/Unity/Hub/Editor/${properties.UNITY_VERSION}/Unity.app/Contents/MacOS/Unity -quit -buildTarget iOS -batchmode -projectPath . -executeMethod BuildScript.PerformiOSBuild"
             }
     
             stageName='Build XCode project'
