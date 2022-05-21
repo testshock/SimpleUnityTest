@@ -30,6 +30,9 @@ node('NativeMacOSJenkins') {
             stageName='Build XCode project'
             stage(stageName){
                 dir('builds/iOS') {
+                    withCredentials([usernamePassword(credentialsId: 'testshock', passwordVariable: 'ROOT_PWD')]) {
+                        sh "security unlock-keychain -p ${ROOT_PWD} ~/Library/Keychains/login.keychain"
+                    }
                     sh "xcodebuild -project Unity-iPhone.xcodeproj -scheme Unity-iPhone -configuration Release CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=5CS6V7W342 -archivePath ../../${properties.PROJECT_NAME}-${properties.VERSION}.xcarchive archive"
                 }
             }
