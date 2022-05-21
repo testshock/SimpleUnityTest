@@ -75,7 +75,7 @@ node('NativeMacOSJenkins') {
     } catch (e){
         currentBuild.result='FAILURE'
         errorMessage="Failed on stage "+stageName
-        notifyFailed(stageName,e,properties.PROJECT_NAME,properties.VERSION,env.BRANCH_NAME,$GIT_COMMIT_SHORT)
+        notifyFailed(stageName,e,properties.PROJECT_NAME,properties.VERSION,env.BRANCH_NAME,GIT_COMMIT_SHORT)
     }
 }
 
