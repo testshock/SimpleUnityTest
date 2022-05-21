@@ -29,7 +29,12 @@ node('NativeMacOSJenkins') {
     
             stageName='Build XCode project'
             stage(stageName){
-                sh 'xcodebuild -project build/iOS/Unity-iPhone.xcodeproj -scheme "Unity-iPhone" -configuration Release CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=5CS6V7W342 -archivePath ${properties.VERSION}.xcarchive archive'
+                dir('builds/iOS') {
+                    withCredentials([string(credentialsId: 'root_pwd', variable: 'ROOT_PASSWORD')]) {
+                        sh 'security unlock-keychain -p $ROOT_PASSWORD ~/Library/Keychains/login.keychain'
+                    }
+                    sh "xcodebuild -project Unity-iPhone.xcodeproj -scheme Unity-iPhone -configuration Release CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=5CS6V7W342 -archivePath ../../${properties.PROJECT_NAME}-${properties.VERSION}.xcarchive archive"
+                }
             }
         }
         
@@ -39,7 +44,7 @@ node('NativeMacOSJenkins') {
         // i just zip and upload the build dir. I know that this is wrong, it's just a placeholder
         stageName='Archive artifacts'
         stage(stageName){
-            sh "zip -r ${properties.VERSION}.zip ${properties.VERSION}.xcarchive"
+            sh "zip -r ${properties.VERSION}.zip ${properties.PROJECT_NAME}-${properties.VERSION}.xcarchive"
         }
 
 
@@ -68,7 +73,7 @@ node('NativeMacOSJenkins') {
     } catch (e){
         currentBuild.result='FAILURE'
         errorMessage="Failed on stage "+stageName
-        notifyFailed(stageName,e,properties.PROJECT_NAME,properties.VERSION,env.BRANCH_NAME,$GIT_COMMIT_SHORT)
+        notifyFailed(stageName,e,properties.PROJECT_NAME,properties.VERSION,env.BRANCH_NAME,GIT_COMMIT_SHORT)
     }
 }
 
